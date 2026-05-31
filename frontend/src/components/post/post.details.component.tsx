@@ -17,6 +17,7 @@ import LoadingAnimation from "../loading/loading.component";
 import SSProfile from "../ui-component/ss-profile/ss-profile";
 import ImageFallback from "../ImageFallback";
 import BookmarkButton from "../BookmarkButton";
+import AudioPlayer from "../AudioPlayer";
 
 import { formatDateShort } from "../../utils/time-formate";
 import { getUserInfo } from "../../services/auth.service";
@@ -181,35 +182,31 @@ const PostDetailsComponent = () => {
     return email === currentUser?.email;
   });
 
-  const shareUrl = window.location.href;
-
-  const shareTitle = post?.title || "Check out this story!";
-
   const handleTwitterShare = () => {
+    const currentUrl = window.location.href;
+    const currentTitle = post?.title || "Check out this story!";
     const url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(
-      shareUrl
-    )}&text=${encodeURIComponent(shareTitle)}`;
-
+      currentUrl
+    )}&text=${encodeURIComponent(currentTitle)}`;
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleLinkedInShare = () => {
+    const currentUrl = window.location.href;
     const url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
-      shareUrl
+      currentUrl
     )}`;
-
     window.open(url, "_blank", "noopener,noreferrer");
   };
 
   const handleEmailShare = () => {
-    const subject = `Story Spark AI - ${shareTitle}`;
-
-    const body = `Check out this interesting story on Story Spark AI: "${shareTitle}"\n\nRead it here: ${shareUrl}`;
-
+    const currentUrl = window.location.href;
+    const currentTitle = post?.title || "Check out this story!";
+    const subject = `Story Spark AI - ${currentTitle}`;
+    const body = `Check out this interesting story on Story Spark AI: "${currentTitle}"\n\nRead it here: ${currentUrl}`;
     const url = `mailto:?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
-
     window.location.href = url;
   };
 
@@ -231,7 +228,6 @@ const PostDetailsComponent = () => {
       toast.error("Unable to remove this story. Please try again.");
     }
   };
-
   if (isLoading) {
     return <LoadingAnimation />;
   }
@@ -379,6 +375,12 @@ const PostDetailsComponent = () => {
                 <div className="prose max-w-none mb-12 text-slate-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed text-lg font-light">
                   <p>{post?.content}</p>
                 </div>
+
+                {post?.content && (
+                  <div className="mb-12">
+                    <AudioPlayer text={post.content} title={post.title} />
+                  </div>
+                )}
               </>
             )}
 
@@ -559,4 +561,3 @@ const PostDetailsComponent = () => {
 };
 
 export default PostDetailsComponent;
-

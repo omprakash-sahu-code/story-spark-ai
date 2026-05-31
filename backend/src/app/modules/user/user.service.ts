@@ -3,8 +3,8 @@ import ApiError from "../../../errors/api_error";
 import { ITokenPayload } from "../../../interfaces/token";
 import { IUser } from "./user.interface";
 import { User } from "./user.model";
-import httpStatus from "http-status";
 import { Post } from "../post/post.model";
+import httpStatus from "http-status";
 import { Comment } from "../comment/comment.model";
 import { Reaction } from "../reaction/reaction.model";
 import { Bookmark } from "../bookmark/bookmark.model";
@@ -28,7 +28,11 @@ const updateUser = async (token: ITokenPayload, payload: Partial<IUser>) => {
   const updateData: Record<string, unknown> = {};
 
   if (typeof payload.name === "string") {
-    updateData.name = payload.name;
+    const trimmedName = payload.name.trim();
+    if (!trimmedName) {
+      throw new ApiError(httpStatus.BAD_REQUEST, "Full Name cannot be empty!");
+    }
+    updateData.name = trimmedName;
   }
 
   if (payload.profile) {
@@ -71,6 +75,12 @@ const updateUser = async (token: ITokenPayload, payload: Partial<IUser>) => {
 };
 
 const deleteUser = async (id: string): Promise<void> => {
+  const userExists = await User.exists({ _id: id });
+
+  if (!userExists) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+  }
+
   // Get all posts authored by this user
   const userPosts = await Post.find({ author: id }).select("_id").lean();
   const postIds = userPosts.map((p) => p._id);
@@ -112,7 +122,11 @@ const deleteUser = async (id: string): Promise<void> => {
   await Post.deleteMany({ author: id });
 
   // Finally delete the user
-  await User.deleteOne({ _id: id });
+  const result = await User.deleteOne({ _id: id });
+
+  if (result.deletedCount === 0) {
+    throw new ApiError(httpStatus.NOT_FOUND, "User not found!");
+  }
 };
 
 const applyForWriter = async (token: ITokenPayload) => {
@@ -195,6 +209,18 @@ const getProfileInfo = async (token: ITokenPayload) => {
   if (!user) {
     throw new ApiError(httpStatus.BAD_REQUEST, "User not found!");
   }
+
+  const publishedPostsCount = await Post.countDocuments({
+    author: user._id,
+    isPublished: true,
+    isDeleted: { $ne: true },
+  });
+
+  if (user.postsCount !== publishedPostsCount) {
+    user.postsCount = publishedPostsCount;
+    await user.save();
+  }
+
   return user;
 };
 

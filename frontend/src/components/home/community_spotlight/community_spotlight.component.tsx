@@ -56,7 +56,7 @@ const formatMetric = (value: number) =>
   new Intl.NumberFormat("en", { notation: "compact" }).format(value);
 
 const CommunitySpotlightComponent = () => {
-  const { data, isLoading, isError } = useGetLatestListsQuery(undefined);
+  const { data, isLoading, isError, refetch } = useGetLatestListsQuery(undefined);
   const navigate = useNavigate();
 
   console.log("Posts Data:", data?.posts);
@@ -130,6 +130,20 @@ const CommunitySpotlightComponent = () => {
               className="animate-pulse rounded-xl bg-gray-200 dark:bg-slate-800 h-40"
             ></div>
           ))}
+  if (isLoading) return <LoadingAnimation />;
+  if (isError) {
+    return (
+      <section className="story-section">
+        <div className="story-page-shell">
+          <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-10 text-center text-red-200">
+            <p className="mb-3 font-semibold">Failed to load spotlight stories.</p>
+            <button
+              onClick={() => refetch()}
+              className="rounded bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700"
+            >
+              Try Again
+            </button>
+          </div>
         </div>
       </section>
     );
