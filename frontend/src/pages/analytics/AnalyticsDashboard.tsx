@@ -71,8 +71,8 @@ const AnalyticsDashboard: React.FC = () => {
   const wordsToday = user?.postsCount ? user.postsCount * 300 : 350; // Dynamic simulation lookup
   const wordsThisWeek = user?.postsCount ? user.postsCount * 1200 : 1800;
 
-  const dailyGoal = user?.writingGoals?.dailyWordCount || 500;
-  const weeklyGoal = user?.writingGoals?.weeklyWordCount || 2500;
+  const dailyGoal = user?.writingGoals?.dailyWordCount ?? 500;
+  const weeklyGoal = user?.writingGoals?.weeklyWordCount ?? 2500;
 
   const dailyPercentage = Math.round((wordsToday / dailyGoal) * 100) || 0;
   const weeklyPercentage = Math.round((wordsThisWeek / weeklyGoal) * 100) || 0;
@@ -148,7 +148,7 @@ const AnalyticsDashboard: React.FC = () => {
         {!isEditing ? (
           <button
             onClick={() => setIsEditing(true)}
-           className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm transition-all duration-200"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 shadow-sm transition-all duration-200"
           >
             <Edit2 size={16} /> Set Target Goals
           </button>
@@ -157,7 +157,7 @@ const AnalyticsDashboard: React.FC = () => {
             <button
               onClick={handleSaveGoals}
               disabled={isUpdating}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm transition-all duration-200"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 shadow-sm transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Check size={16} /> Save
             </button>
