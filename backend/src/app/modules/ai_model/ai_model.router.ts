@@ -35,6 +35,7 @@ router.post(
   "/generate-model-stream",
   auth(),
   validateRequest(AIModelValidator.aiModel),
+  checkRequestLimit(),
   AiModelController.aiModelGenerateStream
 );
 
